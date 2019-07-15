@@ -1,0 +1,33 @@
+{
+  "name": "ts-decorators-utils",
+  "version": "0.0.2",
+  "description": "多种形式声明装饰器的工具",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/liangshen001/ts-decorators-utils.git"
+  },
+  "keywords": [
+    "typescript"
+  ],
+  "author": "wangliang",
+  "bugs": {
+    "url": "https://github.com/liangshen001/ts-decorators-utils/issues"
+  },
+  "homepage": "https://github.com/liangshen001/ts-decorators-utils#readme",
+  "main": "index.js",
+  "directories": {
+    "lib": "lib"
+  },
+  "scripts": {
+    "build:publish": "tsc && npm publish"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "tslint": "~5.9.1",
+    "typescript": "~2.5.3"
+  }
+}
