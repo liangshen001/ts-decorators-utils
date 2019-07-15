@@ -10,4 +10,3 @@ gen
 **/*.js
 **/*.d.ts
 **/*.js.map
-package-lock.json
