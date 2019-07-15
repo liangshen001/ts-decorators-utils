@@ -14,12 +14,12 @@ const methodDecoratorFactoryBuilder = <P = any, V = any>
 /**
  *
  * @param {symbol} metadataKey
- * @param {(param: P, target: Function, propertyKey: (string | symbol), descriptor) => V} metadataValueConverter
+ * @param {(param: P, target: Object, propertyKey: (string | symbol), descriptor) => V} metadataValueConverter
  * @return {MethodDecorator & ((options?: P) => MethodDecorator)}
  */
 const methodDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
 (metadataKey: symbol, metadataValueConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V):
-    MethodDecorator & ((options?: P) => MethodDecorator) => <any> ((...args) => {
+    (MethodDecorator & ((options?: P) => MethodDecorator)) => <any> ((...args) => {
     if ((args[0] && args[0] instanceof Function)) {
         return methodDecoratorFactoryBuilder(metadataKey, metadataValueConverter)(null)(args[0], args[1], args[2]);
     }
