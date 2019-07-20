@@ -1,13 +1,14 @@
 {
   "name": "ts-decorators-utils",
-  "version": "0.0.3",
+  "version": "0.1.2",
   "description": "多种形式声明装饰器的工具",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/liangshen001/ts-decorators-utils.git"
   },
   "keywords": [
-    "typescript"
+    "typescript",
+    "decorator"
   ],
   "author": "",
   "bugs": {

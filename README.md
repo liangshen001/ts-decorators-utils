@@ -170,31 +170,5 @@ const requestMappingValue: RequestMappingValue =
 
 ## api
 
-```typescript
-const methodDecoratorFactoryBuilder = <P = any, V = any> (metadataKey: symbol, metadataValueConverter: (options: P, target: Function, propertyKey: string | symbol, descriptor) => V) => (options: P): MethodDecorator;
-const methodDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any> (metadataKey: symbol, metadataValueConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V): MethodDecorator & ((options?: P) => MethodDecorator);
-const propertyDecoratorFactoryBuilder = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (param: P, target: Object, propertyKey: string) => V) =>
-    (option: P): PropertyDecorator;
-const classDecoratorFactoryBuilder = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (param: P, target: Function) => V) =>
-    (param: P): ClassDecorator;
-const classDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (param: P, target: Function) => V): ClassDecorator & ((option?: P) => ClassDecorator);
-
-const parameterDecoratorFactoryBuilder = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (option: P, target: Object, propertyKey: string | symbol, parameterIndex: number) => V) =>
-    (option: P): ParameterDecorator;
-const parameterDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (option: P, target: Object, propertyKey: string | symbol, parameterIndex: number) => V):
-    (ParameterDecorator & ((option?: P) => ParameterDecorator));
-const methodAndClassDecoratorFactoryBuilder = <P = any, V1 = any, V2 = any>
-(metadataKey: symbol, metadataValueMethodConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V1,
- metadataValueClassConverter: (param: P, target: Function) => V2) =>
-    (param: P): MethodDecorator & ClassDecorator;
-const methodAndClassDecoratorFactoryBuilderOptionsEmptiable = <P = any, V1 = any, V2 = any>
-(metadataKey: symbol, metadataValueMethodConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V1,
- metadataValueClassConverter: (param: P, target: Function) => V2):
-    (((option?: P) => MethodDecorator & ClassDecorator) & MethodDecorator & ClassDecorator);
-```
+请使用 DecoratorFactory 和 DecoratorOptionNullableFactory 中的方法
 

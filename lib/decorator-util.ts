@@ -1,10 +1,14 @@
 import "reflect-metadata";
 
+
+
+
 /**
  * 方法装饰器工厂 构造器 传入metadataKey metadataValueConverter 由param转化metadataValue
  * @param {symbol} metadataKey
  * @param {(options: P, target: Object, propertyKey: (string | symbol), descriptor) => V} metadataValueConverter
  * @return {(options: P) => MethodDecorator}
+ * @deprecated
  */
 const methodDecoratorFactoryBuilder = <P = any, V = any>
 (metadataKey: symbol, metadataValueConverter: (options: P, target: Function, propertyKey: string | symbol, descriptor) => V) =>
@@ -16,6 +20,7 @@ const methodDecoratorFactoryBuilder = <P = any, V = any>
  * @param {symbol} metadataKey
  * @param {(param: P, target: Object, propertyKey: (string | symbol), descriptor) => V} metadataValueConverter
  * @return {MethodDecorator & ((options?: P) => MethodDecorator)}
+ * @deprecated
  */
 const methodDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
 (metadataKey: symbol, metadataValueConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V):
@@ -31,6 +36,7 @@ const methodDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
  * @param {symbol} metadataKey
  * @param {(param: P, target: Function, propertyKey: (string | symbol)) => V} metadataValueConverter
  * @return {(param: P) => PropertyDecorator}
+ * @deprecated
  */
 const propertyDecoratorFactoryBuilder = <P = any, V = any>
 (metadataKey: symbol, metadataValueConverter: (param: P, target: Object, propertyKey: string) => V) =>
@@ -49,6 +55,7 @@ const propertyDecoratorFactoryBuilder = <P = any, V = any>
  * @param {symbol} metadataKey
  * @param {(param: P, target: Object) => V} metadataValueConverter
  * @return {(param: P) => ClassDecorator}
+ * @deprecated
  */
 const classDecoratorFactoryBuilder = <P = any, V = any>
 (metadataKey: symbol, metadataValueConverter: (param: P, target: Function) => V) =>
@@ -65,6 +72,7 @@ const classDecoratorFactoryBuilder = <P = any, V = any>
  * @param {symbol} metadataKey
  * @param {(param: P, target: Function) => V} metadataValueConverter
  * @return {ClassDecorator & ((option: P) => ClassDecorator)}
+ * @deprecated
  */
 const classDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
 (metadataKey: symbol, metadataValueConverter: (param: P, target: Function) => V): ClassDecorator & ((option?: P) => ClassDecorator) =>
@@ -83,6 +91,7 @@ const classDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
  * @param {symbol} metadataKey
  * @param {(option: P, target: Object, propertyKey: (string | symbol), parameterIndex: number) => V} metadataValueConverter
  * @return {(option: P) => ParameterDecorator}
+ * @deprecated
  */
 const parameterDecoratorFactoryBuilder = <P = any, V = any>
 (metadataKey: symbol, metadataValueConverter: (option: P, target: Object, propertyKey: string | symbol, parameterIndex: number) => V) =>
@@ -92,6 +101,13 @@ const parameterDecoratorFactoryBuilder = <P = any, V = any>
         Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey);
     };
 
+/**
+ *
+ * @param {symbol} metadataKey
+ * @param {(option: P, target: Object, propertyKey: (string | symbol), parameterIndex: number) => V} metadataValueConverter
+ * @return {ParameterDecorator & ((option?: P) => ParameterDecorator)}
+ * @deprecated
+ */
 const parameterDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
 (metadataKey: symbol, metadataValueConverter: (option: P, target: Object, propertyKey: string | symbol, parameterIndex: number) => V):
     (ParameterDecorator & ((option?: P) => ParameterDecorator)) => <any> ((...args) => {
@@ -107,6 +123,7 @@ const parameterDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
  * @param {(param: P, target: Object, propertyKey: (string | symbol), descriptor) => V1} metadataValueMethodConverter
  * @param {(param: P, target: Function) => V2} metadataValueClassConverter
  * @return {(param: P) => (MethodDecorator & ClassDecorator)}
+ * @deprecated
  */
 const methodAndClassDecoratorFactoryBuilder = <P = any, V1 = any, V2 = any>
 (metadataKey: symbol, metadataValueMethodConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V1,
@@ -125,6 +142,7 @@ const methodAndClassDecoratorFactoryBuilder = <P = any, V1 = any, V2 = any>
  * 方法装饰器的 参数和metadataValue转换器
  * @param {(param: P, target: Function) => V2} metadataValueClassConverter 类装饰器的 参数和metadataValue转换器
  * @return {((option?: P) => (MethodDecorator & ClassDecorator)) & MethodDecorator & ClassDecorator}
+ * @deprecated
  */
 const methodAndClassDecoratorFactoryBuilderOptionsEmptiable = <P = any, V1 = any, V2 = any>
 (metadataKey: symbol, metadataValueMethodConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V1,
@@ -140,6 +158,9 @@ const methodAndClassDecoratorFactoryBuilderOptionsEmptiable = <P = any, V1 = any
         }
         return methodAndClassDecoratorFactoryBuilder(metadataKey, metadataValueMethodConverter, metadataValueClassConverter)(args[0])
     };
+
+
+
 
 export {methodDecoratorFactoryBuilder, methodDecoratorFactoryBuilderOptionsEmptiable,
     propertyDecoratorFactoryBuilder, classDecoratorFactoryBuilder, classDecoratorFactoryBuilderOptionsEmptiable,
