@@ -1,4 +1,7 @@
-
+/**
+ * @deprecated
+ * @see DecoratorFactoryBuilder
+ */
 export class DecoratorFactory {
 
     /**

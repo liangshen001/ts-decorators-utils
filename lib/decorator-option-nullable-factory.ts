@@ -1,5 +1,9 @@
 import {DecoratorFactory} from "./decorator-factory";
 
+/**
+ * @deprecated
+ * @see DecoratorFactoryBuilder
+ */
 export class DecoratorOptionNullableFactory {
     static createMethodDecorator<V = any, P = any>(
         metadataKey: symbol, metadataValueConverter: (options: P, target: Function, propertyKey: string | symbol, descriptor) => V):
@@ -89,7 +93,7 @@ export class DecoratorOptionNullableFactory {
      * @return {(option: P) => ClassDecorator}
      */
     static createCustomClassDecorator<P>(callback: (option: P | null, target: Function) => void):
-        (option?: P) => ClassDecorator & ClassDecorator {
+        ((option?: P) => ClassDecorator) & ClassDecorator {
         return (...args) => {
             if (args[0] && args[0] instanceof Function) {
                 return DecoratorFactory.createCustomClassDecorator<P>(callback)(null)(args[0])
