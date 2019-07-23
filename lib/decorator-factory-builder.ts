@@ -7,60 +7,61 @@ export class DecoratorFactoryBuilder {
 
     /**
      * 创建方法装饰器 不使用metadata 手动处理方法
-     * @param {(option: P, target: Function, propertyKey: string, descriptor) => void} handler
+     * @param {(option: P, target: Function, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => void} handler
      * @return {(option: P) => MethodDecorator}
      */
-    static createMethodDecoratorFactory<O>(
-        handler: (option: O, target: Object, propertyKey: string, descriptor) => void):
+    public static createMethodDecoratorFactory<O>(
+        handler: <T>(option: O, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => void):
         (option: O) => MethodDecorator;
 
     /**
      * 创建方法装饰器 使用metadata 手动处理方法 用来把option转换成metadataValue 数据
-     * @param {(option: P, target: Function, propertyKey: string, descriptor) => V} handler
+     * @param {(option: P, target: Function, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V} handler
      * @param {symbol} metadataKey
      * @return {(option: P) => MethodDecorator}
      */
     static createMethodDecoratorFactory<O, V>(
-        handler: (option: O, target: Object, propertyKey: string, descriptor) => V, metadataKey: symbol):
-        (option: O) => MethodDecorator;
+        handler: <T>(option: O, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
+        metadataKey: symbol): (option: O) => MethodDecorator;
 
     static createMethodDecoratorFactory<O, V = void>(
-        handler: (option: O, target: Object, propertyKey: string, descriptor) => V, metadataKey?: symbol):
-        (option: O) => MethodDecorator {
+        handler: <T>(option: O, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
+        metadataKey?: symbol): (option: O) => MethodDecorator {
         return option =>
-            (target: Object, propertyKey: string, descriptor) => {
+            <T>(target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => {
                 const metadataValue = handler(option, target, propertyKey, descriptor);
                 if (metadataValue) {
                     Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey);
                 }
+                return descriptor;
             };
     }
 
     /**
      * 创建属性装饰器工场 不使用metadata
-     * @param {(option: O, target: Object, propertyKey: string) => void} handler
+     * @param {(option: O, target: Object, propertyKey: string | symbol) => void} handler
      * @return {(option: O) => PropertyDecorator}
      */
     static createPropertyDecoratorFactory<O>(
-        handler: (option: O, target: Object, propertyKey: string) => void):
+        handler: (option: O, target: Object, propertyKey: string | symbol) => void):
         (option: O) => PropertyDecorator;
 
     /**
      * 创建属性装饰器工场 使用metadata
      * 属性和方法不一样由于不能得到属性名 所以为类定义一个metadata值为 带有此装饰器的属性集合
-     * @param {(option: O, target: Object, propertyKey: string) => V} handler
+     * @param {(option: O, target: Object, propertyKey: string | symbol) => V} handler
      * @param {symbol} metadataKey
      * @return {(option: O) => PropertyDecorator}
      */
     static createPropertyDecoratorFactory<O, V>(
-        handler: (option: O, target: Object, propertyKey: string) => V, metadataKey: symbol):
+        handler: (option: O, target: Object, propertyKey: string | symbol) => V, metadataKey: symbol):
         (option: O) => PropertyDecorator
 
     static createPropertyDecoratorFactory<O, V = void>(
-        handler: (option: O, target: Object, propertyKey: string) => V, metadataKey?: symbol):
+        handler: (option: O, target: Object, propertyKey: string | symbol) => V, metadataKey?: symbol):
         (option: O) => PropertyDecorator {
         return option =>
-            (target: Object, propertyKey: string) => {
+            (target: Object, propertyKey: string | symbol) => {
                 const value = handler(option, target, propertyKey);
                 if (value) {
                     const metadataValue: V[] = Reflect.getOwnMetadata(metadataKey, target, propertyKey) || [];
@@ -72,33 +73,34 @@ export class DecoratorFactoryBuilder {
 
     /**
      * 创建类装饰器
-     * @param {(option: O, target: Function) => void} handler
+     * @param {(option: O, target: TFunction) => void} handler
      * @return {(option: O) => ClassDecorator}
      */
-    static createClassDecoratorFactory<O>(handler: (option: O, target: Function) => void):
+    static createClassDecoratorFactory<O>(handler: <TFunction extends Function>(option: O, target: TFunction) => void):
         (option: O) => ClassDecorator;
 
     /**
      * 创建类装饰器
-     * @param {(option: O, target: Function) => V} handler
+     * @param {(option: O, target: TFunction) => V} handler
      * @param {symbol} metadataKey
      * @return {(option: O) => ClassDecorator}
      */
     static createClassDecoratorFactory<O, V>(
-        handler: (option: O, target: Function) => V, metadataKey: symbol):
+        handler: <TFunction extends Function>(option: O, target: TFunction) => V, metadataKey: symbol):
         (option: O) => ClassDecorator
 
     static createClassDecoratorFactory<O, V = void>(
-        handler: (option: O, target: Function) => V, metadataKey?: symbol):
+        handler: <TFunction extends Function>(option: O, target: TFunction) => V, metadataKey?: symbol):
         (option: O) => ClassDecorator {
 
         return option =>
-                target => {
-            const value = handler(option, target);
-            if (value) {
-                Reflect.defineMetadata(metadataKey, value, target);
-            }
-        };
+            <TFunction extends Function>(target: TFunction) => {
+                const value = handler(option, target);
+                if (value) {
+                    Reflect.defineMetadata(metadataKey, value, target);
+                }
+                return target;
+            };
     }
 
     /**
@@ -138,29 +140,29 @@ export class DecoratorFactoryBuilder {
 
     /**
      * 使用于类或方法上 不使用metadata
-     * @param {(option: O, target: Object, propertyKey: (string | symbol), descriptor) => void} methodHandler
-     * @param {(option: O, target: Function) => void} classHandler
+     * @param {(option: O, target: Object, propertyKey: (string | symbol), descriptor: TypedPropertyDescriptor<T>) => void} methodHandler
+     * @param {(option: O, target: TFunction) => void} classHandler
      * @return {(option: O) => (MethodDecorator & ClassDecorator)}
      */
     static createMethodAndClassDecoratorFactory<O>(
-        methodHandler: (option: O, target: Object, propertyKey: string | symbol, descriptor) => void,
-        classHandler: (option: O, target: Function) => void): (option: O) => MethodDecorator & ClassDecorator;
+        methodHandler: <T>(option: O, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => void,
+        classHandler: <TFunction extends Function>(option: O, target: TFunction) => void): (option: O) => MethodDecorator & ClassDecorator;
 
     /**
      * 使用于类或方法上 使用metadata
-     * @param {(option: O, target: Object, propertyKey: (string | symbol), descriptor) => V} methodHandler
-     * @param {(option: O, target: Function) => V} classHandler
+     * @param {(option: O, target: Object, propertyKey: (string | symbol), descriptor: TypedPropertyDescriptor<T>) => V} methodHandler
+     * @param {(option: O, target: TFunction) => V} classHandler
      * @param {symbol} metadataKey
      * @return {(option: O) => (MethodDecorator & ClassDecorator)}
      */
     static createMethodAndClassDecoratorFactory<O, V>(
-        methodHandler: (option: O, target: Object, propertyKey: string | symbol, descriptor) => V,
-        classHandler: (option: O, target: Function) => V,
+        methodHandler: <T>(option: O, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
+        classHandler: <TFunction extends Function>(option: O, target: TFunction) => V,
         metadataKey: symbol): (option: O) => MethodDecorator & ClassDecorator;
 
     static createMethodAndClassDecoratorFactory<O, V = void>(
-        methodHandler: (option: O, target: Object, propertyKey: string | symbol, descriptor) => V,
-        classHandler: (option: O, target: Function) => V,
+        methodHandler: <T>(option: O, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
+        classHandler: <TFunction extends Function>(option: O, target: TFunction) => V,
         metadataKey?: symbol): (option: O) => MethodDecorator & ClassDecorator {
         return option =>
             (...args) => {
