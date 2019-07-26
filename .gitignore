@@ -7,6 +7,4 @@
 *.iml
 out
 gen
-**/*.js
-**/*.d.ts
-**/*.js.map
+dist

@@ -1,168 +1,149 @@
-import "reflect-metadata";
-
-
-
+import 'reflect-metadata';
 
 /**
- * 方法装饰器工厂 构造器 传入metadataKey metadataValueConverter 由param转化metadataValue
- * @param {symbol} metadataKey
- * @param {(options: P, target: Object, propertyKey: (string | symbol), descriptor) => V} metadataValueConverter
- * @return {(options: P) => MethodDecorator}
- * @deprecated
+ * 提供一系列创建 装饰器的工场方法
+ * 如果参数为空 小括号必须写 不在支持 不写小括号 '()'
  */
-const methodDecoratorFactoryBuilder = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (options: P, target: Function, propertyKey: string | symbol, descriptor) => V) =>
-    (options: P): MethodDecorator => (target: Function, propertyKey: string | symbol, descriptor) =>
-        Reflect.defineMetadata(metadataKey, metadataValueConverter(
-            options, target, propertyKey, descriptor), target, propertyKey);
-/**
- *
- * @param {symbol} metadataKey
- * @param {(param: P, target: Object, propertyKey: (string | symbol), descriptor) => V} metadataValueConverter
- * @return {MethodDecorator & ((options?: P) => MethodDecorator)}
- * @deprecated
- */
-const methodDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V):
-    (MethodDecorator & ((options?: P) => MethodDecorator)) => <any> ((...args) => {
-    if ((args[0] && args[0] instanceof Function)) {
-        return methodDecoratorFactoryBuilder(metadataKey, metadataValueConverter)(null)(args[0], args[1], args[2]);
+export class DecoratorUtil {
+
+    /**
+     * 创建方法装饰器
+     * @param {<T>(option: O, target: Object, propertyKey: (string | symbol), descriptor: TypedPropertyDescriptor<T>) => V} handler
+     * @param {symbol | string} metadataKey
+     * @return {(option: O) => MethodDecorator}
+     */
+
+    public static makeMethodDecorator<O, V = void>(
+        handler: <T>(option: O, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
+        metadataKey?: symbol | string): (option: O) => MethodDecorator {
+        return option =>
+            (target, propertyKey, descriptor) => {
+                const metadataValue = handler(option, target, propertyKey, descriptor);
+                if (metadataKey) {
+                    if (metadataValue) {
+                        Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey);
+                    } else {
+                        Reflect.defineMetadata(metadataKey, true, target, propertyKey);
+                    }
+                }
+                return descriptor;
+            };
     }
-    return methodDecoratorFactoryBuilder(metadataKey, metadataValueConverter)(args[0]);
-});
 
-/**
- *
- * @param {symbol} metadataKey
- * @param {(param: P, target: Function, propertyKey: (string | symbol)) => V} metadataValueConverter
- * @return {(param: P) => PropertyDecorator}
- * @deprecated
- */
-const propertyDecoratorFactoryBuilder = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (param: P, target: Object, propertyKey: string) => V) =>
-    (option: P): PropertyDecorator => {
-        return (target: Function, propertyKey: string) => {
-            const metadataValue: V[] = Reflect.getOwnMetadata(metadataKey, target, propertyKey) || [];
-            metadataValue.push(metadataValueConverter(option, target, propertyKey));
-            Reflect.defineMetadata(metadataKey, metadataValue, target);
-        };
-            // Reflect.defineMetadata(metadataKey, metadataValueConverter(param, target, propertyKey), target, propertyKey);
-    };
+    /**
+     * 创建属性装饰器工场 不使用metadata
+     * @param {(option: O, target: Object, propertyKey: (string | symbol)) => V} handler
+     * @param {symbol | string} metadataKey
+     * @return {(option: O) => PropertyDecorator}
+     */
 
-
-/**
- * 类装饰器工厂构造器
- * @param {symbol} metadataKey
- * @param {(param: P, target: Object) => V} metadataValueConverter
- * @return {(param: P) => ClassDecorator}
- * @deprecated
- */
-const classDecoratorFactoryBuilder = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (param: P, target: Function) => V) =>
-    (param: P): ClassDecorator => (target) => Reflect.defineMetadata(
-        metadataKey, metadataValueConverter(param, target), target);
-
-/**
- * 类装饰器工厂构造器    工厂参数可为空   工厂也可直接装饰类变成 装饰器构造器
- * 如：
- * 正常使用：@Controller({name: 'name'}) class A{}
- * 装饰器工厂参数为空：@Controller() class A{}
- * 直接装饰：@Controller class A{}
- *
- * @param {symbol} metadataKey
- * @param {(param: P, target: Function) => V} metadataValueConverter
- * @return {ClassDecorator & ((option: P) => ClassDecorator)}
- * @deprecated
- */
-const classDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (param: P, target: Function) => V): ClassDecorator & ((option?: P) => ClassDecorator) =>
-    (...args) => {
-        // 本身为 Decorator  arg为target
-        if (args[0] && args[0] instanceof Function) {
-            return classDecoratorFactoryBuilder(metadataKey, metadataValueConverter)(null)(args[0]);
-        }
-        // 返回Decorator
-        return classDecoratorFactoryBuilder(metadataKey, metadataValueConverter)(args[0]);
-    };
-
-
-/**
- * 参数装饰器工厂构造器
- * @param {symbol} metadataKey
- * @param {(option: P, target: Object, propertyKey: (string | symbol), parameterIndex: number) => V} metadataValueConverter
- * @return {(option: P) => ParameterDecorator}
- * @deprecated
- */
-const parameterDecoratorFactoryBuilder = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (option: P, target: Object, propertyKey: string | symbol, parameterIndex: number) => V) =>
-    (option: P): ParameterDecorator => (target: Function, propertyKey: string | symbol, parameterIndex: number) => {
-        const metadataValue: V[] = Reflect.getOwnMetadata(metadataKey, target, propertyKey) || [];
-        metadataValue.push(metadataValueConverter(option, target, propertyKey, parameterIndex));
-        Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey);
-    };
-
-/**
- *
- * @param {symbol} metadataKey
- * @param {(option: P, target: Object, propertyKey: (string | symbol), parameterIndex: number) => V} metadataValueConverter
- * @return {ParameterDecorator & ((option?: P) => ParameterDecorator)}
- * @deprecated
- */
-const parameterDecoratorFactoryBuilderOptionsEmptiable = <P = any, V = any>
-(metadataKey: symbol, metadataValueConverter: (option: P, target: Object, propertyKey: string | symbol, parameterIndex: number) => V):
-    (ParameterDecorator & ((option?: P) => ParameterDecorator)) => <any> ((...args) => {
-    if (args[0] && args[0] instanceof Function) {
-        return parameterDecoratorFactoryBuilder(metadataKey, metadataValueConverter)(null)(args[0], args[1], args[2])
+    static makePropertyDecorator<O, V = void>(
+        handler: (option: O, target: Object, propertyKey: string | symbol) => V, metadataKey?: symbol | string):
+        (option: O) => PropertyDecorator {
+        return option =>
+            (target, propertyKey) => {
+                const metadataValue = handler(option, target, propertyKey);
+                if (metadataKey) {
+                    if (metadataValue) {
+                        Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey);
+                    } else {
+                        Reflect.defineMetadata(metadataKey, true, target, propertyKey);
+                    }
+                }
+            };
     }
-    return parameterDecoratorFactoryBuilder(metadataKey, metadataValueConverter)(args[0]);
-});
 
-/**
- * 返回方法 类 装饰器工厂构造器
- * @param {symbol} metadataKey
- * @param {(param: P, target: Object, propertyKey: (string | symbol), descriptor) => V1} metadataValueMethodConverter
- * @param {(param: P, target: Function) => V2} metadataValueClassConverter
- * @return {(param: P) => (MethodDecorator & ClassDecorator)}
- * @deprecated
- */
-const methodAndClassDecoratorFactoryBuilder = <P = any, V1 = any, V2 = any>
-(metadataKey: symbol, metadataValueMethodConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V1,
- metadataValueClassConverter: (param: P, target: Function) => V2) =>
-    (param: P): MethodDecorator & ClassDecorator => (...args) => {
-        if (args.length === 1) {
-            return classDecoratorFactoryBuilder<P, V2>(metadataKey, metadataValueClassConverter)(param)(args[0]);
-        } else if (args.length === 3) {
-            return methodDecoratorFactoryBuilder<P, V1>(metadataKey, metadataValueMethodConverter)(param)(args[0], args[1], args[2]);
-        }
-    };
-/**
- * 返回 方法 类  [装饰器工厂构造器（工厂参数可为空）、装饰器构造器]
- * @param {symbol} metadataKey
- * @param {(param: P, target: Object, propertyKey: (string | symbol), descriptor) => V1} metadataValueMethodConverter
- * 方法装饰器的 参数和metadataValue转换器
- * @param {(param: P, target: Function) => V2} metadataValueClassConverter 类装饰器的 参数和metadataValue转换器
- * @return {((option?: P) => (MethodDecorator & ClassDecorator)) & MethodDecorator & ClassDecorator}
- * @deprecated
- */
-const methodAndClassDecoratorFactoryBuilderOptionsEmptiable = <P = any, V1 = any, V2 = any>
-(metadataKey: symbol, metadataValueMethodConverter: (param: P, target: Object, propertyKey: string | symbol, descriptor) => V1,
- metadataValueClassConverter: (param: P, target: Function) => V2):
-    (((option?: P) => MethodDecorator & ClassDecorator) & MethodDecorator & ClassDecorator) =>
-    (...args) => {
-        if (args[0] && args[0] instanceof Function || args.length === 3) {
-            if (args.length === 1) {
-                return classDecoratorFactoryBuilder<P, V2>(metadataKey, metadataValueClassConverter)(null)(args[0]);
-            } else if (args.length === 3) {
-                return methodDecoratorFactoryBuilder<P, V1>(metadataKey, metadataValueMethodConverter)(null)(args[0], args[1], args[2]);
+    /**
+     * 创建类装饰器
+     * @param {<TFunction extends Function>(option: O, target: TFunction) => V} handler
+     * @param {symbol | string} metadataKey
+     * @return {(option: O) => ClassDecorator}
+     */
+
+    static makeClassDecorator<O, V = void>(
+        handler: <TFunction extends Function>(option: O, target: TFunction) => V, metadataKey?: symbol | string):
+        (option: O) => ClassDecorator {
+        return option =>
+            <TFunction extends Function>(target: TFunction) => {
+                const metadataValue = handler(option, target);
+                if (metadataKey) {
+                    if (metadataValue) {
+                        Reflect.defineMetadata(metadataKey, metadataValue, target);
+                    } else {
+                        Reflect.defineMetadata(metadataKey, true, target);
+                    }
+                }
+                return target;
+            };
+    }
+
+    /**
+     * 创建方法参数装饰器 为方法定义一个metadata值为 该方法带有此装饰器的参数集合
+     * @param {(option: O, target: Object, propertyKey: (string | symbol), parameterIndex: number) => V} handler
+     * @param {symbol | string} metadataKey
+     * @return {(option: O) => ParameterDecorator}
+     */
+
+    static makeParameterDecorator<O, V = void>(
+        handler: (option: O, target: Object, propertyKey: string | symbol, parameterIndex: number) => V,
+        metadataKey?: symbol | string):
+        (option: O) => ParameterDecorator {
+        return option =>
+            (target: Function, propertyKey: string | symbol, parameterIndex: number) => {
+                const value = handler(option, target, propertyKey, parameterIndex);
+                if (metadataKey) {
+                    if (value) {
+                        const metadataValue: V[] = Reflect.getOwnMetadata(metadataKey, target, propertyKey) || [];
+                        metadataValue.push(value);
+                        Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey);
+                    } else {
+                        const metadataValue: number[] = Reflect.getOwnMetadata(metadataKey, target, propertyKey) || [];
+                        metadataValue.push(parameterIndex);
+                        Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey);
+                    }
+                }
+            };
+    }
+
+    static makePropertyAndMethodDecorator<OP, OM, V = void>(
+        propertyHandler: (option: OP, target: Object, propertyKey: string | symbol) => V,
+        methodHandler: <T>(option: OM, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
+        metadataKey?: symbol | string
+    ): ((option: OP) => PropertyDecorator) & ((option: OM) => MethodDecorator) {
+        return option =>
+            (...args) => {
+                if (args.length === 2) {
+                    return <any> DecoratorUtil.makePropertyDecorator<OP, V>(
+                        propertyHandler, metadataKey)(option)(args[0], args[1]);
+                } else if (args.length === 3) {
+                    return DecoratorUtil.makeMethodDecorator<OM, V>(
+                        methodHandler, metadataKey)(option)(args[0], args[1], args[2]);
+                }
             }
-        }
-        return methodAndClassDecoratorFactoryBuilder(metadataKey, metadataValueMethodConverter, metadataValueClassConverter)(args[0])
-    };
+    }
 
+    /**
+     * 使用于类或方法上
+     * @param {<T>(option: OM, target: Object, propertyKey: (string | symbol), descriptor: TypedPropertyDescriptor<T>) => V} methodHandler
+     * @param {<TFunction extends Function>(option: OC, target: TFunction) => V} classHandler
+     * @param {symbol | string} metadataKey
+     * @return {((option: OM) => MethodDecorator) & ((option: OC) => ClassDecorator)}
+     */
 
-
-
-export {methodDecoratorFactoryBuilder, methodDecoratorFactoryBuilderOptionsEmptiable,
-    propertyDecoratorFactoryBuilder, classDecoratorFactoryBuilder, classDecoratorFactoryBuilderOptionsEmptiable,
-    parameterDecoratorFactoryBuilder, parameterDecoratorFactoryBuilderOptionsEmptiable,
-    methodAndClassDecoratorFactoryBuilder, methodAndClassDecoratorFactoryBuilderOptionsEmptiable};
+    static makeMethodAndClassDecorator<OM, OC, V = void>(
+        methodHandler: <T>(option: OM, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
+        classHandler: <TFunction extends Function>(option: OC, target: TFunction) => V,
+        metadataKey?: symbol | string
+    ): ((option: OM) => MethodDecorator) & ((option: OC) => ClassDecorator) {
+        return option =>
+            (...args) => {
+                if (args.length === 1) {
+                    return <any> DecoratorUtil.makeClassDecorator<OC, V>(
+                        classHandler, metadataKey)(option)(args[0]);
+                } else if (args.length === 3) {
+                    return <any> DecoratorUtil.makeMethodDecorator<OM, V>(
+                        methodHandler, metadataKey)(option)(args[0], args[1], args[2]);
+                }
+            };
+    }
+}
