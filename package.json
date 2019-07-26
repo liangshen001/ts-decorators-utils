@@ -1,6 +1,6 @@
 {
   "name": "ts-decorators-utils",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "多种形式声明装饰器的工具",
   "repository": {
     "type": "git",
