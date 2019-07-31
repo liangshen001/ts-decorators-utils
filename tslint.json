@@ -38,7 +38,7 @@
     // "no-console":true,// 不允许使用console对象
     "no-debugger":true,// 不允许使用debugger
     "no-duplicate-super":true,// 不允许super() 两次使用在构造函数中
-    "no-empty":true,// 函数体不允许空
+//    "no-empty":true,// 函数体不允许空
     "no-eval":true,// 不允许使用eval
     "no-for-in-array":true,// 不允许对Array使用for-in
     "no-invalid-template-strings":true,// 只允许在模板字符串中使用${
@@ -61,7 +61,7 @@
     "linebreak-style":[true,"CR/LF"],// 换行符格式 CR/LF可以通用使用在windows和osx
     "max-classes-per-file":[true,1],// 每个文件中可定义类的个数
     "max-file-line-count":[true,500],// 定义每个文件代码行数
-    "max-line-length":[true,120],// 定义每行代码数
+    "max-line-length":[true,140],// 定义每行代码数
     "no-default-export":true,// 禁止使用export default关键字，因为当export对象名称发生变化时，需要修改import中的对象名。https://github.com/palantir/tslint/issues/1182#issue-151780453
     "no-duplicate-imports":true,// 禁止在一个文件内，多次引用同一module
 
@@ -82,9 +82,12 @@
       "ignore-jsdoc"
     ],
     "no-unnecessary-initializer":true,// 不允许没有必要的初始化
-    "variable-name":[true,"check-format",// 定义变量命名规则
+    "variable-name":[
+      true,"check-format",// 定义变量命名规则
       "allow-leading-underscore",
       "allow-trailing-underscore",
-      "ban-keywords"]
+      "ban-keywords",
+      "allow-pascal-case"
+    ]
   }
 }

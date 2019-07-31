@@ -37,7 +37,7 @@ export class DecoratorUtil {
      * @return {(option: O) => PropertyDecorator}
      */
 
-    static makePropertyDecorator<O, V = void>(
+    public static makePropertyDecorator<O, V = void>(
         handler: (option: O, target: Object, propertyKey: string | symbol) => V, metadataKey?: symbol | string):
         (option: O) => PropertyDecorator {
         return option =>
@@ -60,7 +60,7 @@ export class DecoratorUtil {
      * @return {(option: O) => ClassDecorator}
      */
 
-    static makeClassDecorator<O, V = void>(
+    public static makeClassDecorator<O, V = void>(
         handler: <TFunction extends Function>(option: O, target: TFunction) => V, metadataKey?: symbol | string):
         (option: O) => ClassDecorator {
         return option =>
@@ -84,7 +84,7 @@ export class DecoratorUtil {
      * @return {(option: O) => ParameterDecorator}
      */
 
-    static makeParameterDecorator<O, V = void>(
+    public static makeParameterDecorator<O, V = void>(
         handler: (option: O, target: Object, propertyKey: string | symbol, parameterIndex: number) => V,
         metadataKey?: symbol | string):
         (option: O) => ParameterDecorator {
@@ -105,7 +105,7 @@ export class DecoratorUtil {
             };
     }
 
-    static makePropertyAndMethodDecorator<OP, OM, V = void>(
+    public static makePropertyAndMethodDecorator<OP, OM, V = void>(
         propertyHandler: (option: OP, target: Object, propertyKey: string | symbol) => V,
         methodHandler: <T>(option: OM, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
         metadataKey?: symbol | string
@@ -130,7 +130,7 @@ export class DecoratorUtil {
      * @return {((option: OM) => MethodDecorator) & ((option: OC) => ClassDecorator)}
      */
 
-    static makeMethodAndClassDecorator<OM, OC, V = void>(
+    public static makeMethodAndClassDecorator<OM, OC, V = void>(
         methodHandler: <T>(option: OM, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
         classHandler: <TFunction extends Function>(option: OC, target: TFunction) => V,
         metadataKey?: symbol | string
@@ -146,4 +146,51 @@ export class DecoratorUtil {
                 }
             };
     }
+
+    public static a() {
+        return 0;
+    }
+
+    /**
+     * 创建 可用于所有'目标'(方法参数，属性，方法，类)上的装饰器
+     * @param parameterHandler
+     * @param propertyHandler
+     * @param methodHandler
+     * @param classHandler
+     * @param metadataKey
+     */
+    public static makeParameterAndPropertyAndMethodAndClassDecorator<OPA, OP, OM, OC, V = void>(
+        parameterHandler?: (option: OPA, target: Object, propertyKey: string | symbol, parameterIndex: number) => V,
+        propertyHandler?: (option: OP, target: Object, propertyKey: string | symbol) => V,
+        methodHandler?: <T>(option: OM, target: Object, propertyKey: string | symbol, descriptor: TypedPropertyDescriptor<T>) => V,
+        classHandler?: <TFunction extends Function>(option: OC, target: TFunction) => V,
+        metadataKey?: symbol | string
+    ): ((option: OPA) => ParameterDecorator) & ((option: OP) => PropertyDecorator)
+        & ((option: OM) => MethodDecorator) & ((option: OC) => ClassDecorator) {
+        return option =>
+            (...args) => {
+                // args 参数为装饰器 回调参数 不同种类的装饰器有不同的参数
+                if (args.length === 1) {
+                    // 处理类装饰器
+                    return classHandler && DecoratorUtil.makeClassDecorator<OC, V>(
+                        classHandler, metadataKey)(option)(args[0]);
+                } else if (args.length === 2) {
+                    // 外理属性装饰器
+                    return propertyHandler && DecoratorUtil.makePropertyDecorator<OP, V>(
+                        propertyHandler, metadataKey)(option)(args[0], args[1]);
+                } else if (args.length === 3) {
+                    if (typeof args[2] === 'number') {
+                        // 处理参数装饰器
+                        return parameterHandler && DecoratorUtil.makeParameterDecorator<OPA, V>(
+                            parameterHandler, metadataKey)(option)(args[0], args[1], args[2]);
+                    } else {
+                        // 处理方法装饰器
+                        return methodHandler && DecoratorUtil.makeMethodDecorator<OM, V>(
+                            methodHandler, metadataKey)(option)(args[0], args[1], args[2]);
+                    }
+                }
+            };
+    }
 }
+
+
