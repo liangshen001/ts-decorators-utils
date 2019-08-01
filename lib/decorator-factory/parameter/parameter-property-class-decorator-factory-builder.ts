@@ -1,10 +1,10 @@
 import {
     AbstractDecoratorFactoryBuilder,
-    ClassHandler,
-    MethodHandler,
-    ParameterHandler,
-    PropertyHandler
 } from '../abstract-decorator-factory-builder';
+import {ParameterHandler} from '../../bean/parameter-handler';
+import {PropertyHandler} from '../../bean/property-handler';
+import {ClassHandler} from '../../bean/class-handler';
+import {MethodHandler} from '../../bean/method-handler';
 import {DecoratorUtil} from '../../decorator-util';
 import {ParameterMethodDecoratorFactoryBuilder} from './parameter-method-decorator-factory-builder';
 import {ParameterClassDecoratorFactoryBuilder} from './parameter-class-decorator-factory-builder';
@@ -13,6 +13,7 @@ import {ParameterDecoratorFactory} from './parameter-decorator-factory-builder';
 import {PropertyDecoratorFactory} from '../property/property-decorator-factory-builder';
 import {ClassDecoratorFactory} from '../class/class-decorator-factory-builder';
 import {ParameterPropertyMethodClassDecoratorFactoryBuilder} from './parameter-property-method-class-decorator-factory-builder';
+import {MetadataKey} from '../../bean/metadata-key';
 
 type ParameterPropertyClassDecoratorFactory<OPA, OP, OC> =
     ParameterDecoratorFactory<OPA> & PropertyDecoratorFactory<OP> & ClassDecoratorFactory<OC>;
@@ -21,7 +22,7 @@ class ParameterPropertyClassDecoratorFactoryBuilder<V, OPA, OP, OC>
     extends AbstractDecoratorFactoryBuilder<V, ParameterPropertyClassDecoratorFactory<OPA, OP, OC>> {
 
     constructor(
-        public metadataKey: symbol | string | undefined,
+        public metadataKey: MetadataKey<V> | undefined,
         public parameterHandler: ParameterHandler<V, OPA>,
         public propertyHandler: PropertyHandler<V, OP>,
         public classHandler: ClassHandler<V, OC>,

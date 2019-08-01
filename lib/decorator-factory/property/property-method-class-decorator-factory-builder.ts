@@ -1,15 +1,16 @@
 import {
     AbstractDecoratorFactoryBuilder,
-    ClassHandler,
-    MethodHandler,
-    ParameterHandler,
-    PropertyHandler
 } from '../abstract-decorator-factory-builder';
+import {ParameterHandler} from '../../bean/parameter-handler';
+import {PropertyHandler} from '../../bean/property-handler';
+import {ClassHandler} from '../../bean/class-handler';
+import {MethodHandler} from '../../bean/method-handler';
 import {ClassDecoratorFactory} from '../class/class-decorator-factory-builder';
 import {DecoratorUtil} from '../../decorator-util';
 import {PropertyDecoratorFactory} from './property-decorator-factory-builder';
 import {MethodDecoratorFactory} from '../method/method-decorator-factory-builder';
 import {ParameterPropertyMethodClassDecoratorFactoryBuilder} from '../parameter/parameter-property-method-class-decorator-factory-builder';
+import {MetadataKey} from '../../bean/metadata-key';
 
 type PropertyMethodClassDecoratorFactory<OP, OM, OC> =
     PropertyDecoratorFactory<OP> & MethodDecoratorFactory<OM> & ClassDecoratorFactory<OC>;
@@ -18,7 +19,7 @@ class PropertyMethodClassDecoratorFactoryBuilder<V, OP, OM, OC>
     extends AbstractDecoratorFactoryBuilder<V, PropertyMethodClassDecoratorFactory<OP, OM, OC>> {
 
     constructor(
-        public metadataKey: symbol | string | undefined,
+        public metadataKey: MetadataKey<V> | undefined,
         public propertyHandler: PropertyHandler<V, OP>,
         public methodHandler: MethodHandler<V, OM>,
         public classHandler: ClassHandler<V, OC>
