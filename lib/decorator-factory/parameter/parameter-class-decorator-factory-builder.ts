@@ -11,8 +11,15 @@ import {ClassDecoratorFactory} from '../class/class-decorator-factory-builder';
 import {ParameterMethodClassDecoratorFactoryBuilder} from './parameter-method-class-decorator-factory-builder';
 import {ParameterPropertyClassDecoratorFactoryBuilder} from './parameter-property-class-decorator-factory-builder';
 import {MetadataKey} from '../../bean/metadata-key';
+import {MethodDecoratorFactory} from '../method/method-decorator-factory-builder';
 
-type ParameterClassDecoratorFactory<OPA, OC> = ParameterDecoratorFactory<OPA> & ClassDecoratorFactory<OC>;
+type DecoratorFactoryUnionType<OPA, OC> = ParameterDecoratorFactory<OPA> & ClassDecoratorFactory<OC>;
+
+type ParameterClassDecoratorFactory<OPA, OC> = OPA extends OC
+    ? OC extends OPA
+        ? (option: OPA) => ParameterDecorator & ClassDecorator
+        : DecoratorFactoryUnionType<OPA, OC>
+    : DecoratorFactoryUnionType<OPA, OC>;
 
 class ParameterClassDecoratorFactoryBuilder<V, OPA, OC>
     extends AbstractDecoratorFactoryBuilder<V, ParameterClassDecoratorFactory<OPA, OC>> {
@@ -26,7 +33,7 @@ class ParameterClassDecoratorFactoryBuilder<V, OPA, OC>
     }
 
     public build(): ParameterClassDecoratorFactory<OPA, OC> {
-        return DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<OPA, void, void, OC, V>(
+        return <any> DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<OPA, void, void, OC, V>(
             this.parameterHandler, undefined, undefined, this.classHandler, this.metadataKey);
     }
 

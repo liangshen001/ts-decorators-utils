@@ -11,9 +11,30 @@ import {PropertyDecoratorFactory} from './property-decorator-factory-builder';
 import {MethodDecoratorFactory} from '../method/method-decorator-factory-builder';
 import {ParameterPropertyMethodClassDecoratorFactoryBuilder} from '../parameter/parameter-property-method-class-decorator-factory-builder';
 import {MetadataKey} from '../../bean/metadata-key';
+import {PropertyMethodDecoratorFactory} from './property-method-decorator-factory-builder';
+import {PropertyClassDecoratorFactory} from './property-class-decorator-factory-builder';
+import {MethodClassDecoratorFactory} from '../method/method-class-decorator-factory-builder';
 
-type PropertyMethodClassDecoratorFactory<OP, OM, OC> =
-    PropertyDecoratorFactory<OP> & MethodDecoratorFactory<OM> & ClassDecoratorFactory<OC>;
+
+type DecoratorFactoryUnionType<OP, OM, OC> = MethodDecoratorFactory<OM> & ClassDecoratorFactory<OC> & PropertyDecoratorFactory<OP>;
+
+type PropertyMethodClassDecoratorFactory<OP, OM, OC> = OP extends OM
+    ? OM extends OP
+        ? OP extends OC
+            ? OC extends OP
+                ? (options: OP) => PropertyDecorator & MethodDecorator & ClassDecorator
+                : PropertyMethodDecoratorFactory<OP, OM> & ClassDecoratorFactory<OC>
+            : PropertyMethodDecoratorFactory<OP, OM> & ClassDecoratorFactory<OC>
+        : OP extends OC
+            ? OC extends OP
+                ? PropertyClassDecoratorFactory<OP, OC> & MethodDecoratorFactory<OM>
+                : MethodClassDecoratorFactory<OM, OC> & PropertyDecoratorFactory<OP>
+            : MethodClassDecoratorFactory<OM, OC> & PropertyDecoratorFactory<OP>
+    : OP extends OC
+        ? OC extends OP
+            ? PropertyClassDecoratorFactory<OP, OC> & MethodDecoratorFactory<OM>
+            : MethodClassDecoratorFactory<OM, OC> & PropertyDecoratorFactory<OP>
+        : DecoratorFactoryUnionType<OP, OM, OC>;
 
 class PropertyMethodClassDecoratorFactoryBuilder<V, OP, OM, OC>
     extends AbstractDecoratorFactoryBuilder<V, PropertyMethodClassDecoratorFactory<OP, OM, OC>> {
@@ -28,7 +49,7 @@ class PropertyMethodClassDecoratorFactoryBuilder<V, OP, OM, OC>
     }
 
     public build(): PropertyMethodClassDecoratorFactory<OP, OM, OC> {
-        return DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<void, OP, OM, OC, V>(
+        return <any> DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<void, OP, OM, OC, V>(
             undefined, this.propertyHandler, this.methodHandler, this.classHandler, this.metadataKey);
     }
 

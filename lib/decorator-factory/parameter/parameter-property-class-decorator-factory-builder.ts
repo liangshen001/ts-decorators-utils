@@ -6,17 +6,38 @@ import {PropertyHandler} from '../../bean/property-handler';
 import {ClassHandler} from '../../bean/class-handler';
 import {MethodHandler} from '../../bean/method-handler';
 import {DecoratorUtil} from '../../decorator-util';
-import {ParameterMethodDecoratorFactoryBuilder} from './parameter-method-decorator-factory-builder';
-import {ParameterClassDecoratorFactoryBuilder} from './parameter-class-decorator-factory-builder';
-import {ParameterPropertyDecoratorFactoryBuilder} from './parameter-property-decorator-factory-builder';
+import {ParameterMethodDecoratorFactory, ParameterMethodDecoratorFactoryBuilder} from './parameter-method-decorator-factory-builder';
+import {ParameterClassDecoratorFactory, ParameterClassDecoratorFactoryBuilder} from './parameter-class-decorator-factory-builder';
+import {ParameterPropertyDecoratorFactory, ParameterPropertyDecoratorFactoryBuilder} from './parameter-property-decorator-factory-builder';
 import {ParameterDecoratorFactory} from './parameter-decorator-factory-builder';
 import {PropertyDecoratorFactory} from '../property/property-decorator-factory-builder';
 import {ClassDecoratorFactory} from '../class/class-decorator-factory-builder';
 import {ParameterPropertyMethodClassDecoratorFactoryBuilder} from './parameter-property-method-class-decorator-factory-builder';
 import {MetadataKey} from '../../bean/metadata-key';
+import {MethodDecoratorFactory} from '../method/method-decorator-factory-builder';
+import {MethodClassDecoratorFactory} from '../method/method-class-decorator-factory-builder';
+import {PropertyClassDecoratorFactory} from '../property/property-class-decorator-factory-builder';
 
-type ParameterPropertyClassDecoratorFactory<OPA, OP, OC> =
-    ParameterDecoratorFactory<OPA> & PropertyDecoratorFactory<OP> & ClassDecoratorFactory<OC>;
+
+type DecoratorFactoryUnionType<OPA, OP, OC> = ParameterDecoratorFactory<OPA> & PropertyDecoratorFactory<OP> & ClassDecoratorFactory<OC>;
+
+type ParameterPropertyClassDecoratorFactory<OPA, OP, OC> = OPA extends OP
+    ? OP extends OPA
+        ? OPA extends OC
+            ? OC extends OPA
+                ? (options: OPA) => PropertyDecorator & MethodDecorator & ClassDecorator
+                : ParameterPropertyDecoratorFactory<OPA, OP> & ClassDecoratorFactory<OC>
+            : ParameterPropertyDecoratorFactory<OPA, OP> & ClassDecoratorFactory<OC>
+        : OPA extends OC
+            ? OC extends OPA
+                ? ParameterClassDecoratorFactory<OPA, OC> & PropertyDecoratorFactory<OP>
+                : PropertyClassDecoratorFactory<OP, OC> & ParameterDecoratorFactory<OPA>
+            : PropertyClassDecoratorFactory<OP, OC> & ParameterDecoratorFactory<OPA>
+    : OPA extends OC
+        ? OC extends OPA
+            ? ParameterClassDecoratorFactory<OPA, OC> & PropertyDecoratorFactory<OP>
+            : PropertyClassDecoratorFactory<OP, OC> & ParameterDecoratorFactory<OPA>
+        : DecoratorFactoryUnionType<OPA, OP, OC>;
 
 class ParameterPropertyClassDecoratorFactoryBuilder<V, OPA, OP, OC>
     extends AbstractDecoratorFactoryBuilder<V, ParameterPropertyClassDecoratorFactory<OPA, OP, OC>> {
@@ -31,7 +52,7 @@ class ParameterPropertyClassDecoratorFactoryBuilder<V, OPA, OP, OC>
     }
 
     public build(): ParameterPropertyClassDecoratorFactory<OPA, OP, OC> {
-        return DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<OPA, OP, void, OC, V>(
+        return <any> DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<OPA, OP, void, OC, V>(
             this.parameterHandler, this.propertyHandler, undefined, this.classHandler, this.metadataKey);
     }
 

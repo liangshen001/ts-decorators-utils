@@ -13,7 +13,13 @@ import {PropertyMethodClassDecoratorFactoryBuilder} from './property-method-clas
 import {ParameterPropertyClassDecoratorFactoryBuilder} from '../parameter/parameter-property-class-decorator-factory-builder';
 import {MetadataKey} from '../../bean/metadata-key';
 
-type PropertyClassDecoratorFactory<OP, OC> = PropertyDecoratorFactory<OP> & ClassDecoratorFactory<OC>;
+type DecoratorFactoryUnionType<OP, OC> = PropertyDecoratorFactory<OP> & ClassDecoratorFactory<OC>;
+
+type PropertyClassDecoratorFactory<OP, OC> = OP extends OC
+    ? OC extends OP
+        ? (option: OP) => PropertyDecorator & ClassDecorator
+        : DecoratorFactoryUnionType<OP, OC>
+    : DecoratorFactoryUnionType<OP, OC>;
 
 class PropertyClassDecoratorFactoryBuilder<V, OP, OC>
     extends AbstractDecoratorFactoryBuilder<V, PropertyClassDecoratorFactory<OP, OC>> {
@@ -27,7 +33,7 @@ class PropertyClassDecoratorFactoryBuilder<V, OP, OC>
     }
 
     public build(): PropertyClassDecoratorFactory<OP, OC> {
-        return DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<void, OP, void, OC, V>(
+        return <any> DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<void, OP, void, OC, V>(
             undefined, this.propertyHandler, undefined, this.classHandler, this.metadataKey);
     }
     public class<OC = void>(

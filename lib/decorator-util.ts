@@ -24,14 +24,14 @@ export class DecoratorUtil {
         metadataKey?: MetadataKey<V>): (option: O) => MethodDecorator {
         return option =>
             (target, propertyKey, descriptor) => {
-                const paramtypes = Reflect.getMetadata('design:paramtypes', target, propertyKey) || [];
+                const paramtypes = Reflect.getMetadata('design:paramtypes', target, propertyKey);
                 const returntype = Reflect.getMetadata('design:returntype', target, propertyKey);
                 const metadataValue = handler(option, target, propertyKey, descriptor, paramtypes, returntype);
                 if (metadataKey) {
-                    if (metadataValue) {
-                        Reflect.defineMetadata(metadataKey.value, metadataValue, target, propertyKey);
-                    } else {
+                    if (metadataValue === undefined) {
                         Reflect.defineMetadata(metadataKey.value, true, target, propertyKey);
+                    } else {
+                        Reflect.defineMetadata(metadataKey.value, metadataValue, target, propertyKey);
                     }
                 }
                 return descriptor;
@@ -52,15 +52,12 @@ export class DecoratorUtil {
         return option =>
             (target, propertyKey) => {
                 const type = Reflect.getMetadata('design:type', target, propertyKey);
-                const descriptor = Object.getOwnPropertyDescriptor(target, propertyKey) || {};
-                descriptor.configurable = true;
-                const metadataValue = handler(option, target, propertyKey, descriptor, type);
-                Object.defineProperty(target, propertyKey, descriptor);
+                const metadataValue = handler(option, target, propertyKey, type);
                 if (metadataKey) {
-                    if (metadataValue) {
-                        Reflect.defineMetadata(metadataKey.value, metadataValue, target, propertyKey);
-                    } else {
+                    if (metadataValue === undefined) {
                         Reflect.defineMetadata(metadataKey.value, true, target, propertyKey);
+                    } else {
+                        Reflect.defineMetadata(metadataKey.value, metadataValue, target, propertyKey);
                     }
                 }
             };
@@ -82,10 +79,10 @@ export class DecoratorUtil {
                 const paramtypes = Reflect.getMetadata('design:paramtypes', target);
                 const metadataValue = handler(option, target, paramtypes);
                 if (metadataKey) {
-                    if (metadataValue) {
-                        Reflect.defineMetadata(metadataKey.value, metadataValue, target);
-                    } else {
+                    if (metadataValue === undefined) {
                         Reflect.defineMetadata(metadataKey.value, true, target);
+                    } else {
+                        Reflect.defineMetadata(metadataKey.value, metadataValue, target);
                     }
                 }
                 return target;
@@ -109,7 +106,11 @@ export class DecoratorUtil {
                 const value = handler(option, target, propertyKey, parameterIndex, paramtypes[parameterIndex]);
                 if (metadataKey) {
                     const key = DecoratorUtil._getParameterPropertyKey(propertyKey, parameterIndex);
-                    Reflect.defineMetadata(metadataKey.value, value, target, key);
+                    if (value === undefined) {
+                        Reflect.defineMetadata(metadataKey.value, true, target, key);
+                    } else {
+                        Reflect.defineMetadata(metadataKey.value, value, target, key);
+                    }
                 }
             };
     }
@@ -137,9 +138,12 @@ export class DecoratorUtil {
                     // 处理类装饰器
                     return classHandler && DecoratorUtil.makeClassDecorator<OC, V>(
                         classHandler, metadataKey)(option)(args[0]);
-                } else if (args.length === 2) {
                 } else if (args.length === 3) {
-                    if (args[2]) {
+                    if (args[2] === undefined) {
+                        // 外理属性装饰器
+                        return propertyHandler && DecoratorUtil.makePropertyDecorator<OP, V>(
+                            propertyHandler, metadataKey)(option)(args[0], args[1]);
+                    } else {
                         if (typeof args[2] === 'number') {
                             // 处理参数装饰器
                             return parameterHandler && DecoratorUtil.makeParameterDecorator<OPA, V>(
@@ -149,10 +153,6 @@ export class DecoratorUtil {
                             return methodHandler && DecoratorUtil.makeMethodDecorator<OM, V>(
                                 methodHandler, metadataKey)(option)(args[0], args[1], args[2]);
                         }
-                    } else {
-                        // 外理属性装饰器
-                        return propertyHandler && DecoratorUtil.makePropertyDecorator<OP, V>(
-                            propertyHandler, metadataKey)(option)(args[0], args[1]);
                     }
                 }
             };
