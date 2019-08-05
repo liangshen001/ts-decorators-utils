@@ -25,7 +25,7 @@ class ParameterMethodDecoratorFactoryBuilder<V, OPA, OM> extends
     AbstractDecoratorFactoryBuilder<V, ParameterMethodDecoratorFactory<OPA, OM>> {
 
     constructor(
-        public metadataKey: MetadataKey<V> | undefined,
+        public metadataKey: string | symbol | undefined,
         public parameterHandler: ParameterHandler<V, OPA>,
         public methodHandler: MethodHandler<V, OM>
     ) {

@@ -16,7 +16,7 @@ type ParameterDecoratorFactory<OPA> = (option: OPA) => ParameterDecorator;
 class ParameterDecoratorFactoryBuilder<V, OPA> extends AbstractDecoratorFactoryBuilder<V, ParameterDecoratorFactory<OPA>> {
 
     constructor(
-        public metadataKey: MetadataKey<V> | undefined,
+        public metadataKey: string | symbol | undefined,
         public parameterHandler: ParameterHandler<V, OPA>
     ) {
         super(metadataKey);

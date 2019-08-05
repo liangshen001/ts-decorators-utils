@@ -13,7 +13,7 @@ import {MetadataKey} from '../bean/metadata-key';
 
 class DecoratorFactoryBuilder<V> extends AbstractDecoratorFactoryBuilder<V, void> {
 
-    public static create<V = void>(metadataKey?: MetadataKey<V>): DecoratorFactoryBuilder<V> {
+    public static create<V = void>(metadataKey?: string | symbol): DecoratorFactoryBuilder<V> {
         return new DecoratorFactoryBuilder<V>(metadataKey);
     }
 
@@ -34,7 +34,7 @@ class DecoratorFactoryBuilder<V> extends AbstractDecoratorFactoryBuilder<V, void
     ): ClassDecoratorFactoryBuilder<V, OC> {
         return new ClassDecoratorFactoryBuilder<V, OC>(this.metadataKey, classHandler);
     }
-    public property<OP = void>(propertyHandler: PropertyHandler<V, OP>): PropertyDecoratorFactoryBuilder<V, OP> {
+    public property<OP = void>(propertyHandler?: PropertyHandler<V, OP>): PropertyDecoratorFactoryBuilder<V, OP> {
         return new PropertyDecoratorFactoryBuilder<V, OP>(this.metadataKey, propertyHandler);
     }
 

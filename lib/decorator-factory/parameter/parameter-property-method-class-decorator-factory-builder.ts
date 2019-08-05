@@ -18,31 +18,13 @@ import {PropertyMethodDecoratorFactory} from '../property/property-method-decora
 type DecoratorFactoryUnionType<OPA, OP, OM, OC> =
     ParameterDecoratorFactory<OPA> & PropertyDecoratorFactory<OP> & MethodDecoratorFactory<OM> & ClassDecoratorFactory<OC>;
 
-type ParameterPropertyMethodClassDecoratorFactory<OPA, OP, OM, OC> = DecoratorFactoryUnionType<OPA, OP, OM, OC>;
-
-// OPA extends OP
-    // ? OP extends OPA
-    //     ? OPA extends OM
-    //         ? OM extends OPA
-    //             ? (options: OPA) => PropertyDecorator & MethodDecorator & ClassDecorator
-    //             : ParameterPropertyDecoratorFactory<OPA, OP> & MethodDecoratorFactory<OM>
-    //         : ParameterPropertyDecoratorFactory<OPA, OP> & MethodDecoratorFactory<OM>
-    //     : OPA extends OM
-    //         ? OM extends OPA
-    //             ? ParameterMethodDecoratorFactory<OPA, OM> & PropertyDecoratorFactory<OP>
-    //             : PropertyMethodDecoratorFactory<OP, OM> & ParameterDecoratorFactory<OPA>
-    //         : PropertyMethodDecoratorFactory<OP, OM> & ParameterDecoratorFactory<OPA>
-    // : OPA extends OM
-    //     ? OM extends OPA
-    //         ? ParameterMethodDecoratorFactory<OPA, OM> & PropertyDecoratorFactory<OP>
-    //         : PropertyMethodDecoratorFactory<OP, OM> & ParameterDecoratorFactory<OPA>
-    //     : DecoratorFactoryUnionType<OPA, OP, OM, OC>;
+type ParameterPropertyMethodClassDecoratorFactory<OPA, OP, OM, OC> = any
 
 class ParameterPropertyMethodClassDecoratorFactoryBuilder<V, OPA, OP, OM, OC>
     extends AbstractDecoratorFactoryBuilder<V, ParameterPropertyMethodClassDecoratorFactory<OPA, OP, OM, OC>> {
 
     constructor(
-        public metadataKey: MetadataKey<V> | undefined,
+        public metadataKey: string | symbol | undefined,
         public parameterHandler: ParameterHandler<V, OPA>,
         public propertyHandler: PropertyHandler<V, OP>,
         public methodHandler: MethodHandler<V, OM>,

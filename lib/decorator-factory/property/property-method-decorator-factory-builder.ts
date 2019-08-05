@@ -26,7 +26,7 @@ class PropertyMethodDecoratorFactoryBuilder<V, OP, OM>
     extends AbstractDecoratorFactoryBuilder<V, PropertyMethodDecoratorFactory<OP, OM>> {
 
     constructor(
-        public metadataKey: MetadataKey<V> | undefined,
+        public metadataKey: string | symbol | undefined,
         public propertyHandler: PropertyHandler<V, OP>,
         public methodHandler: MethodHandler<V, OM>
     ) {

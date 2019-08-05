@@ -6,7 +6,7 @@ import {MethodHandler} from '../bean/method-handler';
 
 abstract class AbstractDecoratorFactoryBuilder<V, D> {
 
-    constructor(public metadataKey?: MetadataKey<V>) {}
+    constructor(public metadataKey?: string | symbol) {}
 
     public abstract parameter<OPA>(
         parameterHandler: ParameterHandler<V, OPA>,

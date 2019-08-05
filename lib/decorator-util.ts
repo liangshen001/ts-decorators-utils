@@ -5,6 +5,7 @@ import {ParameterHandler} from './bean/parameter-handler';
 import {PropertyHandler} from './bean/property-handler';
 import {MethodHandler} from './bean/method-handler';
 import {ClassHandler} from './bean/class-handler';
+import {MetadataInfo} from "./bean/metadata-info";
 
 /**
  * 提供一系列创建 装饰器的工场方法
@@ -21,7 +22,7 @@ export class DecoratorUtil {
 
     public static makeMethodDecorator<O, V = void>(
         handler: MethodHandler<V, O>,
-        metadataKey?: MetadataKey<V>): (option: O) => MethodDecorator {
+        metadataKey?: string | symbol): (option: O) => MethodDecorator {
         return option =>
             (target, propertyKey, descriptor) => {
                 const paramtypes = Reflect.getMetadata('design:paramtypes', target, propertyKey);
@@ -29,9 +30,9 @@ export class DecoratorUtil {
                 const metadataValue = handler(option, target, propertyKey, descriptor, paramtypes, returntype);
                 if (metadataKey) {
                     if (metadataValue === undefined) {
-                        Reflect.defineMetadata(metadataKey.value, true, target, propertyKey);
+                        Reflect.defineMetadata(metadataKey, true, target, propertyKey);
                     } else {
-                        Reflect.defineMetadata(metadataKey.value, metadataValue, target, propertyKey);
+                        Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey);
                     }
                 }
                 return descriptor;
@@ -47,7 +48,7 @@ export class DecoratorUtil {
 
     public static makePropertyDecorator<O, V = void>(
         handler: PropertyHandler<V, O>,
-        metadataKey?: MetadataKey<V>
+        metadataKey?: string | symbol
     ): (option: O) => PropertyDecorator {
         return option =>
             (target, propertyKey) => {
@@ -55,9 +56,9 @@ export class DecoratorUtil {
                 const metadataValue = handler(option, target, propertyKey, type);
                 if (metadataKey) {
                     if (metadataValue === undefined) {
-                        Reflect.defineMetadata(metadataKey.value, true, target, propertyKey);
+                        Reflect.defineMetadata(metadataKey, true, target, propertyKey);
                     } else {
-                        Reflect.defineMetadata(metadataKey.value, metadataValue, target, propertyKey);
+                        Reflect.defineMetadata(metadataKey, metadataValue, target, propertyKey);
                     }
                 }
             };
@@ -72,7 +73,7 @@ export class DecoratorUtil {
 
     public static makeClassDecorator<O, V = void>(
         handler: ClassHandler<V, O>,
-        metadataKey?: MetadataKey<V>):
+        metadataKey?: string | symbol):
         (option: O) => ClassDecorator {
         return option =>
             <TFunction extends Function>(target: TFunction) => {
@@ -80,9 +81,9 @@ export class DecoratorUtil {
                 const metadataValue = handler(option, target, paramtypes);
                 if (metadataKey) {
                     if (metadataValue === undefined) {
-                        Reflect.defineMetadata(metadataKey.value, true, target);
+                        Reflect.defineMetadata(metadataKey, true, target);
                     } else {
-                        Reflect.defineMetadata(metadataKey.value, metadataValue, target);
+                        Reflect.defineMetadata(metadataKey, metadataValue, target);
                     }
                 }
                 return target;
@@ -98,7 +99,7 @@ export class DecoratorUtil {
 
     public static makeParameterDecorator<O, V = void>(
         handler: ParameterHandler<V, O>,
-        metadataKey?: MetadataKey<V>
+        metadataKey?: string | symbol
     ): (option: O) => ParameterDecorator {
         return option =>
             (target: Function, propertyKey: string, parameterIndex: number) => {
@@ -107,9 +108,9 @@ export class DecoratorUtil {
                 if (metadataKey) {
                     const key = DecoratorUtil._getParameterPropertyKey(propertyKey, parameterIndex);
                     if (value === undefined) {
-                        Reflect.defineMetadata(metadataKey.value, true, target, key);
+                        Reflect.defineMetadata(metadataKey, true, target, key);
                     } else {
-                        Reflect.defineMetadata(metadataKey.value, value, target, key);
+                        Reflect.defineMetadata(metadataKey, value, target, key);
                     }
                 }
             };
@@ -128,10 +129,9 @@ export class DecoratorUtil {
         propertyHandler?: PropertyHandler<V, OP>,
         methodHandler?: MethodHandler<V, OM>,
         classHandler?: ClassHandler<V, OC>,
-        metadataKey?: MetadataKey<V>
-    ): ((option: OPA) => ParameterDecorator) & ((option: OP) => PropertyDecorator)
-        & ((option: OM) => MethodDecorator) & ((option: OC) => ClassDecorator) {
-        return option =>
+        metadataKey?: string | symbol
+    ): any {
+        const factory = option =>
             (...args) => {
                 // args 参数为装饰器 回调参数 不同种类的装饰器有不同的参数
                 if (args.length === 1) {
@@ -156,18 +156,20 @@ export class DecoratorUtil {
                     }
                 }
             };
+        factory.metadataKey = metadataKey;
+        return factory;
     }
 
-    public static getMetadata<V>(metadataKey: MetadataKey<V>, target: Object, propertyKey?: string, parameterIndex?: number)
-        : V | undefined {
+    public static getMetadata<V>(metadataInfo: MetadataInfo<V>, target: Object, propertyKey?: string, parameterIndex?: number)
+        : (V extends void ? true : V) | undefined {
         if (propertyKey) {
-            if (parameterIndex) {
-                const key = DecoratorUtil._getParameterPropertyKey(propertyKey, parameterIndex);
-                return <V> Reflect.getMetadata(metadataKey.value, target, key);
+            if (parameterIndex === undefined) {
+                return <any> Reflect.getMetadata(metadataInfo.metadataKey, target, propertyKey);
             }
-            return <V> Reflect.getMetadata(metadataKey.value, target, propertyKey);
+            const key = DecoratorUtil._getParameterPropertyKey(propertyKey, parameterIndex);
+            return <any> Reflect.getMetadata(metadataInfo.metadataKey, target, key);
         }
-        return <V> Reflect.getMetadata(metadataKey.value, target);
+        return <any> Reflect.getMetadata(metadataInfo.metadataKey, target);
     }
 
     private static _getParameterPropertyKey(propertyKey: string, parameterIndex: number) {

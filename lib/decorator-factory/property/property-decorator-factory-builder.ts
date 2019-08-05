@@ -16,7 +16,7 @@ type PropertyDecoratorFactory<OP> = (option: OP) => PropertyDecorator;
 class PropertyDecoratorFactoryBuilder<V, OP> extends AbstractDecoratorFactoryBuilder<V, PropertyDecoratorFactory<OP>> {
 
     constructor(
-        public metadataKey: MetadataKey<V> | undefined,
+        public metadataKey: string | symbol | undefined,
         public propertyHandler: PropertyHandler<V, OP>
     ) {
         super(metadataKey);
