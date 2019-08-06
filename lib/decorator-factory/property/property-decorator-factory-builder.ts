@@ -1,6 +1,4 @@
-import {
-    AbstractDecoratorFactoryBuilder,
-} from '../abstract-decorator-factory-builder';
+import {AbstractDecoratorFactoryBuilder,} from '../abstract-decorator-factory-builder';
 import {ParameterHandler} from '../../bean/parameter-handler';
 import {PropertyHandler} from '../../bean/property-handler';
 import {ClassHandler} from '../../bean/class-handler';
@@ -9,7 +7,7 @@ import {DecoratorUtil} from '../../decorator-util';
 import {PropertyClassDecoratorFactoryBuilder} from './property-class-decorator-factory-builder';
 import {PropertyMethodDecoratorFactoryBuilder} from './property-method-decorator-factory-builder';
 import {ParameterPropertyDecoratorFactoryBuilder} from '../parameter/parameter-property-decorator-factory-builder';
-import {MetadataKey} from '../../bean/metadata-key';
+import {MetadataDecoratorFactory} from "../../bean/metadata-decorator-factory";
 
 type PropertyDecoratorFactory<OP> = (option: OP) => PropertyDecorator;
 
@@ -22,7 +20,7 @@ class PropertyDecoratorFactoryBuilder<V, OP> extends AbstractDecoratorFactoryBui
         super(metadataKey);
     }
 
-    public build(): PropertyDecoratorFactory<OP> {
+    public build(): MetadataDecoratorFactory<PropertyDecoratorFactory<OP>, V> {
         return DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<void, OP, void, void, V>(
             undefined, this.propertyHandler, undefined, undefined, this.metadataKey);
     }

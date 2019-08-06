@@ -1,20 +1,17 @@
-import {
-    AbstractDecoratorFactoryBuilder,
-} from '../abstract-decorator-factory-builder';
+import {AbstractDecoratorFactoryBuilder,} from '../abstract-decorator-factory-builder';
 import {ParameterHandler} from '../../bean/parameter-handler';
 import {PropertyHandler} from '../../bean/property-handler';
 import {ClassHandler} from '../../bean/class-handler';
 import {MethodHandler} from '../../bean/method-handler';
 import {DecoratorUtil} from '../../decorator-util';
-import {ParameterMethodDecoratorFactory, ParameterMethodDecoratorFactoryBuilder} from './parameter-method-decorator-factory-builder';
-import {ParameterClassDecoratorFactory, ParameterClassDecoratorFactoryBuilder} from './parameter-class-decorator-factory-builder';
-import {ParameterPropertyDecoratorFactoryBuilder} from './parameter-property-decorator-factory-builder';
+import {ParameterMethodDecoratorFactory} from './parameter-method-decorator-factory-builder';
+import {ParameterClassDecoratorFactory} from './parameter-class-decorator-factory-builder';
 import {ParameterDecoratorFactory} from './parameter-decorator-factory-builder';
 import {MethodDecoratorFactory} from '../method/method-decorator-factory-builder';
 import {ClassDecoratorFactory} from '../class/class-decorator-factory-builder';
 import {ParameterPropertyMethodClassDecoratorFactoryBuilder} from './parameter-property-method-class-decorator-factory-builder';
-import {MetadataKey} from '../../bean/metadata-key';
 import {MethodClassDecoratorFactory} from '../method/method-class-decorator-factory-builder';
+import {MetadataDecoratorFactory} from "../../bean/metadata-decorator-factory";
 
 
 type DecoratorFactoryUnionType<OPA, OM, OC> = ParameterDecoratorFactory<OPA> & MethodDecoratorFactory<OM> & ClassDecoratorFactory<OC>;
@@ -49,7 +46,7 @@ class ParameterMethodClassDecoratorFactoryBuilder<V, OPA, OM, OC>
         super(metadataKey);
     }
 
-    public build(): ParameterMethodClassDecoratorFactory<OPA, OM, OC> {
+    public build(): MetadataDecoratorFactory<ParameterMethodClassDecoratorFactory<OPA, OM, OC>, V> {
         return <any> DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<OPA, void, OM, OC, V>(
             this.parameterHandler, undefined, this.methodHandler, this.classHandler, this.metadataKey);
     }

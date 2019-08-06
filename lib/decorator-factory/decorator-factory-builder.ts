@@ -9,12 +9,11 @@ import {ParameterDecoratorFactoryBuilder} from './parameter/parameter-decorator-
 import {MethodDecoratorFactoryBuilder} from './method/method-decorator-factory-builder';
 import {ClassDecoratorFactoryBuilder} from './class/class-decorator-factory-builder';
 import {PropertyDecoratorFactoryBuilder} from './property/property-decorator-factory-builder';
-import {MetadataKey} from '../bean/metadata-key';
 
 class DecoratorFactoryBuilder<V> extends AbstractDecoratorFactoryBuilder<V, void> {
 
-    public static create<V = void>(metadataKey?: string | symbol): DecoratorFactoryBuilder<V> {
-        return new DecoratorFactoryBuilder<V>(metadataKey);
+    public static create<V = void>(metadataKey?: string): DecoratorFactoryBuilder<V> {
+        return new DecoratorFactoryBuilder<V>(Symbol(metadataKey));
     }
 
     public parameter<OPA = void>(
@@ -34,11 +33,11 @@ class DecoratorFactoryBuilder<V> extends AbstractDecoratorFactoryBuilder<V, void
     ): ClassDecoratorFactoryBuilder<V, OC> {
         return new ClassDecoratorFactoryBuilder<V, OC>(this.metadataKey, classHandler);
     }
-    public property<OP = void>(propertyHandler?: PropertyHandler<V, OP>): PropertyDecoratorFactoryBuilder<V, OP> {
+    public property<OP = void>(propertyHandler: PropertyHandler<V, OP>): PropertyDecoratorFactoryBuilder<V, OP> {
         return new PropertyDecoratorFactoryBuilder<V, OP>(this.metadataKey, propertyHandler);
     }
 
-    protected build() {
+    protected build(): any {
     }
 }
 
