@@ -4,6 +4,7 @@ import {PropertyHandler} from './bean/property-handler';
 import {MethodHandler} from './bean/method-handler';
 import {ClassHandler} from './bean/class-handler';
 import {MetadataInfo} from "./bean/metadata-info";
+import {Constructor} from "./bean/constructor";
 
 /**
  * 提供一系列创建 装饰器的工场方法
@@ -25,6 +26,20 @@ export class DecoratorUtil {
             (target, propertyKey, descriptor) => {
                 const paramtypes = Reflect.getMetadata('design:paramtypes', target, propertyKey);
                 const returntype = Reflect.getMetadata('design:returntype', target, propertyKey);
+
+                const _classMethodsMap = DecoratorUtil._classMethodsMap;
+                let properties;
+                if (_classMethodsMap.has(target)) {
+                    properties = _classMethodsMap.get(target);
+                } else {
+                    properties = [];
+                    _classMethodsMap.set(target, properties);
+                }
+                const currentProperty = properties.find(([key]) => key === propertyKey);
+                if (!currentProperty) {
+                    properties.push([propertyKey, paramtypes, returntype]);
+                }
+
                 let metadataValue;
                 if (handler) {
                     metadataValue = (<any>handler)(option, target, propertyKey, descriptor, paramtypes, returntype);
@@ -53,9 +68,23 @@ export class DecoratorUtil {
         return option =>
             (target, propertyKey) => {
                 const type = Reflect.getMetadata('design:type', target, propertyKey);
+                /***************************************处理 设置_classPropertiesMap****************************************/
+                const propertiesMap = DecoratorUtil._classPropertiesMap;
+                let properties;
+                if (propertiesMap.has(target)) {
+                    properties = propertiesMap.get(target);
+                } else {
+                    properties = [];
+                    propertiesMap.set(target, properties);
+                }
+                const currentProperty = properties.find(([key]) => key === propertyKey);
+                if (!currentProperty) {
+                    properties.push([propertyKey, type]);
+                }
+                /***************************************************************************************************/
                 let metadataValue;
                 if (handler) {
-                    metadataValue = (<any>handler)(option, target, propertyKey, type);
+                    metadataValue = (<any> handler)(option, target, propertyKey, type);
                     if (metadataValue === undefined) {
                         metadataValue = true;
                     }
@@ -179,9 +208,17 @@ export class DecoratorUtil {
         return <any> Reflect.getMetadata(metadataInfo.metadataKey, target);
     }
 
+    public static getProperties(target: Object): [string, Constructor][] {
+        return DecoratorUtil._classPropertiesMap.get(target) || [];
+    }
+
+    public static getMethods(target: Object): [string, Constructor[], Constructor][] {
+        return DecoratorUtil._classMethodsMap.get(target) || [];
+    }
+
+    private static _classPropertiesMap = new Map<Object, [string, Constructor][]>();
+    private static _classMethodsMap = new Map<Object, [string, Constructor[], Constructor][]>();
     private static _getParameterPropertyKey(propertyKey: string, parameterIndex: number) {
         return `${propertyKey}&${parameterIndex}`;
     }
 }
-
-
