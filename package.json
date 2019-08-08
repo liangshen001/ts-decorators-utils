@@ -1,6 +1,6 @@
 {
   "name": "ts-decorators-utils",
-  "version": "0.3.6",
+  "version": "0.3.7",
   "description": "多种形式声明装饰器的工具",
   "repository": {
     "type": "git",
@@ -32,9 +32,7 @@
   "devDependencies": {
     "reflect-metadata": "^0.1.13",
     "tslint": "~5.9.1",
-    "typescript": "^3.5.3"
-  },
-  "dependencies": {
+    "typescript": "^3.5.3",
     "ts-node": "^8.3.0"
   }
 }
