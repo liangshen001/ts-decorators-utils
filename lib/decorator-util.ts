@@ -10,7 +10,7 @@ import {MakeDecoratorUtil} from "./make-decorator-util";
 export class DecoratorUtil {
 
     public static getMetadata<V>(metadataInfo: MetadataInfo<V>, target: Object, propertyKey?: string, parameterIndex?: number)
-        : V | true {
+        : (V extends void ? true : V) | undefined {
         if (propertyKey) {
             if (parameterIndex === undefined) {
                 return <any> Reflect.getMetadata(metadataInfo.metadataKey, target, propertyKey);
