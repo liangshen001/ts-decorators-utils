@@ -3,11 +3,11 @@ import {ParameterHandler} from '../../bean/parameter-handler';
 import {PropertyHandler} from '../../bean/property-handler';
 import {ClassHandler} from '../../bean/class-handler';
 import {MethodHandler} from '../../bean/method-handler';
-import {DecoratorUtil} from '../../decorator-util';
 import {MethodClassDecoratorFactoryBuilder} from '../method/method-class-decorator-factory-builder';
 import {PropertyClassDecoratorFactoryBuilder} from '../property/property-class-decorator-factory-builder';
 import {ParameterClassDecoratorFactoryBuilder} from '../parameter/parameter-class-decorator-factory-builder';
 import {MetadataDecoratorFactory} from "../../bean/metadata-decorator-factory";
+import {MakeDecoratorUtil} from "../../make-decorator-util";
 
 type ClassDecoratorFactory<OC> = (option: OC) => ClassDecorator;
 
@@ -21,7 +21,7 @@ class ClassDecoratorFactoryBuilder<V, OC> extends AbstractDecoratorFactoryBuilde
     }
 
     public build(): MetadataDecoratorFactory<ClassDecoratorFactory<OC>, V> {
-        return DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<void, void, void, OC, V>(
+        return MakeDecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<void, void, void, OC, V>(
             undefined, undefined, undefined, this.classHandler, this.metadataKey);
     }
 

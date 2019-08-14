@@ -12,8 +12,8 @@ import {PropertyDecoratorFactoryBuilder} from './property/property-decorator-fac
 
 class DecoratorFactoryBuilder<V> extends AbstractDecoratorFactoryBuilder<V, void> {
 
-    public static create<V = void>(metadataKey?: string): DecoratorFactoryBuilder<V> {
-        return new DecoratorFactoryBuilder<V>(Symbol(metadataKey));
+    public static create<V = void>(metadataKey?: string | symbol): DecoratorFactoryBuilder<V> {
+        return new DecoratorFactoryBuilder<V>(metadataKey || Symbol());
     }
 
     public parameter<OPA = void>(

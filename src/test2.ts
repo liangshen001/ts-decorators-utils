@@ -1,5 +1,5 @@
-import {DecoratorFactoryBuilder} from './decorator-factory/decorator-factory-builder';
-import {DecoratorUtil} from "./decorator-util";
+import {DecoratorFactoryBuilder} from "../lib/decorator-factory/decorator-factory-builder";
+import {DecoratorUtil} from "../lib/decorator-util";
 
 const Value2 = DecoratorFactoryBuilder.create<string>()
     .method<string>().class<string>().build();
@@ -7,11 +7,11 @@ const Value2 = DecoratorFactoryBuilder.create<string>()
 @Value2('demo2')
 class Demo2 {
 
+    constructor(public a: string, public b: number) {}
     @Value2('testStatic')
     public static testStatic(a: number): void {
     }
 
-    constructor(public a: string, public b: number) {}
 
     @Value2('test')
     public test(b: string): Date {
@@ -31,4 +31,3 @@ console.log(DecoratorUtil.getProperties(Demo2.prototype)); // []
 console.log(DecoratorUtil.getMethods(Demo2)); // [ [ 'testStatic', [ [Function: Number] ], undefined ] ]
 // 可以获得类中 使用装饰器的静态属性 集合
 console.log(DecoratorUtil.getProperties(Demo2)); // []
-

@@ -3,12 +3,12 @@ import {ParameterHandler} from '../../bean/parameter-handler';
 import {PropertyHandler} from '../../bean/property-handler';
 import {ClassHandler} from '../../bean/class-handler';
 import {MethodHandler} from '../../bean/method-handler';
-import {DecoratorUtil} from '../../decorator-util';
 import {ParameterDecoratorFactory} from './parameter-decorator-factory-builder';
 import {ClassDecoratorFactory} from '../class/class-decorator-factory-builder';
 import {ParameterMethodClassDecoratorFactoryBuilder} from './parameter-method-class-decorator-factory-builder';
 import {ParameterPropertyClassDecoratorFactoryBuilder} from './parameter-property-class-decorator-factory-builder';
 import {MetadataDecoratorFactory} from "../../bean/metadata-decorator-factory";
+import {MakeDecoratorUtil} from "../../make-decorator-util";
 
 type DecoratorFactoryUnionType<OPA, OC> = ParameterDecoratorFactory<OPA> & ClassDecoratorFactory<OC>;
 
@@ -30,7 +30,7 @@ class ParameterClassDecoratorFactoryBuilder<V, OPA, OC>
     }
 
     public build(): MetadataDecoratorFactory<ParameterClassDecoratorFactory<OPA, OC>, V> {
-        return <any> DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<OPA, void, void, OC, V>(
+        return <any> MakeDecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<OPA, void, void, OC, V>(
             this.parameterHandler, undefined, undefined, this.classHandler, this.metadataKey);
     }
 

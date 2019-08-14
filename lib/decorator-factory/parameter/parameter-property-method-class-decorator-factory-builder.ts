@@ -3,12 +3,12 @@ import {ParameterHandler} from '../../bean/parameter-handler';
 import {PropertyHandler} from '../../bean/property-handler';
 import {ClassHandler} from '../../bean/class-handler';
 import {MethodHandler} from '../../bean/method-handler';
-import {DecoratorUtil} from '../../decorator-util';
 import {ParameterDecoratorFactory} from './parameter-decorator-factory-builder';
 import {PropertyDecoratorFactory} from '../property/property-decorator-factory-builder';
 import {MethodDecoratorFactory} from '../method/method-decorator-factory-builder';
 import {ClassDecoratorFactory} from '../class/class-decorator-factory-builder';
 import {MetadataDecoratorFactory} from "../../bean/metadata-decorator-factory";
+import {MakeDecoratorUtil} from "../../make-decorator-util";
 
 type DecoratorFactoryUnionType<OPA, OP, OM, OC> =
     ParameterDecoratorFactory<OPA> & PropertyDecoratorFactory<OP> & MethodDecoratorFactory<OM> & ClassDecoratorFactory<OC>;
@@ -29,7 +29,7 @@ class ParameterPropertyMethodClassDecoratorFactoryBuilder<V, OPA, OP, OM, OC>
     }
 
     public build(): MetadataDecoratorFactory<ParameterPropertyMethodClassDecoratorFactory<OPA, OP, OM, OC>, V> {
-        return <any> DecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<OPA, OP, OM, OC, V>(
+        return <any> MakeDecoratorUtil.makeParameterAndPropertyAndMethodAndClassDecorator<OPA, OP, OM, OC, V>(
             this.parameterHandler, this.propertyHandler, this.methodHandler, this.classHandler, this.metadataKey);
     }
 

@@ -10,3 +10,4 @@ gen
 demo
 package-lock.json
 lib/*
+src/*

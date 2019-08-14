@@ -1,7 +1,7 @@
 {
   "name": "ts-decorators-utils",
-  "version": "0.3.6",
-  "description": "多种形式声明装饰器的工具",
+  "version": "1.0.0",
+  "description": "Typescript decorator declarations and reflection tools",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/liangshen001/ts-decorators-utils.git"
@@ -21,7 +21,7 @@
     "lib": "lib"
   },
   "scripts": {
-    "start": "ts-node ./lib/demo.ts",
+    "test": "ts-node src/test.ts",
     "build": "tsc",
     "release": "tsc && npm publish"
   },
