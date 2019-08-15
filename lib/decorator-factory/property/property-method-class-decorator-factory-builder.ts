@@ -13,7 +13,6 @@ import {MethodClassDecoratorFactory} from '../method/method-class-decorator-fact
 import {MetadataDecoratorFactory} from "../../bean/metadata-decorator-factory";
 import {MakeDecoratorUtil} from "../../make-decorator-util";
 
-
 type DecoratorFactoryUnionType<OP, OM, OC> = MethodDecoratorFactory<OM> & ClassDecoratorFactory<OC> & PropertyDecoratorFactory<OP>;
 
 type PropertyMethodClassDecoratorFactory<OP, OM, OC> = OP extends OM
@@ -32,7 +31,7 @@ type PropertyMethodClassDecoratorFactory<OP, OM, OC> = OP extends OM
         ? OC extends OP
             ? PropertyClassDecoratorFactory<OP, OC> & MethodDecoratorFactory<OM>
             : MethodClassDecoratorFactory<OM, OC> & PropertyDecoratorFactory<OP>
-        : DecoratorFactoryUnionType<OP, OM, OC>;
+        : MethodClassDecoratorFactory<OM, OC> & PropertyDecoratorFactory<OP>;
 
 class PropertyMethodClassDecoratorFactoryBuilder<V, OP, OM, OC>
     extends AbstractDecoratorFactoryBuilder<V, PropertyMethodClassDecoratorFactory<OP, OM, OC>> {

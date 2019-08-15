@@ -2,11 +2,10 @@ import {MethodHandler} from "./bean/method-handler";
 import {PropertyHandler} from "./bean/property-handler";
 import {ClassHandler} from "./bean/class-handler";
 import {ParameterHandler} from "./bean/parameter-handler";
-import {Constructor} from "./bean/constructor";
 
 export class MakeDecoratorUtil {
-    public static classPropertiesMap = new Map<Object, [string, Constructor][]>();
-    public static classMethodsMap = new Map<Object, [string, Constructor[], Constructor][]>();
+    public static classPropertiesMap = new Map<Object, [string, FunctionConstructor][]>();
+    public static classMethodsMap = new Map<Object, [string, FunctionConstructor[], FunctionConstructor][]>();
 
     public static getParameterPropertyKey(propertyKey: string, parameterIndex: number) {
         return `${propertyKey}&${parameterIndex}`;

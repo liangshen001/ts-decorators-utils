@@ -1,6 +1,5 @@
 import 'reflect-metadata';
 import {MetadataInfo} from "./bean/metadata-info";
-import {Constructor} from "./bean/constructor";
 import {MakeDecoratorUtil} from "./make-decorator-util";
 
 /**
@@ -22,11 +21,11 @@ export class DecoratorUtil {
         return <any> Reflect.getMetadata(metadataInfo.metadataKey, target);
     }
 
-    public static getProperties(target: Object): [string, Constructor][] {
+    public static getProperties(target: Object): [string, FunctionConstructor][] {
         return MakeDecoratorUtil.classPropertiesMap.get(target) || [];
     }
 
-    public static getMethods(target: Object): [string, Constructor[], Constructor][] {
+    public static getMethods(target: Object): [string, FunctionConstructor[], FunctionConstructor][] {
         return MakeDecoratorUtil.classMethodsMap.get(target) || [];
     }
 }

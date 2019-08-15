@@ -2,9 +2,9 @@ import {DecoratorFactoryBuilder} from "../lib/decorator-factory/decorator-factor
 import {DecoratorUtil} from "../lib/decorator-util";
 
 const Value2 = DecoratorFactoryBuilder.create<string>()
-    .method<string>().class<string>().build();
+    .method<string>().class<number>().property().build();
 
-@Value2('demo2')
+@Value2(123)
 class Demo2 {
 
     constructor(public a: string, public b: number) {}
