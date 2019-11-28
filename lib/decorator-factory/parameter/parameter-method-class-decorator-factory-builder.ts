@@ -20,7 +20,7 @@ type ParameterMethodClassDecoratorFactory<OPA, OM, OC> = OPA extends OM
     ? OM extends OPA
         ? OPA extends OC
             ? OC extends OPA
-                ? (options: OPA) => PropertyDecorator & MethodDecorator & ClassDecorator
+                ? (options: OPA) => ParameterDecorator & MethodDecorator & ClassDecorator
                 : ParameterMethodDecoratorFactory<OPA, OM> & ClassDecoratorFactory<OC>
             : ParameterMethodDecoratorFactory<OPA, OM> & ClassDecoratorFactory<OC>
         : OPA extends OC

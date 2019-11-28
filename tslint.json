@@ -1,9 +1,9 @@
 {
   "rules": {
     // TS特性
-    "member-access": true, // 设置成员对象的访问权限（public,private,protect)
+    "member-access": false, // 设置成员对象的访问权限（public,private,protect)
     "member-ordering": [// 设置修饰符顺序
-      true,
+      false,
       {
         "order": [
           "public-static-field",
